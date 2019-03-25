@@ -1,15 +1,15 @@
-package com.isb.telephonedirectory.validator.mobilenumber;
+package com.isb.telephonedirectory.customvalidator.mobilenumber;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
-public class MobileNumberValidator implements ConstraintValidator<IsValidMobileNumber, String> {
+public class MobileNumberValidator implements ConstraintValidator<ValidMobileNumber, String> {
 
     private String mobileNumberRegex = null;
 
     @Override
-    public void initialize(IsValidMobileNumber constraintAnnotation) {
+    public void initialize(ValidMobileNumber constraintAnnotation) {
         mobileNumberRegex = "^\\+?[1-9]\\d{1,14}$";
     }
 

@@ -1,15 +1,15 @@
-package com.isb.telephonedirectory.validator.customerid;
+package com.isb.telephonedirectory.customvalidator.customerid;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
-public class TaxIdentityNumberValidator implements ConstraintValidator<IsValidTaxIdentityNumber, String> {
+public class TaxIdentityNumberValidator implements ConstraintValidator<ValidTaxIdentityNumber, String> {
 
     private String tinRegex = null;
 
     @Override
-    public void initialize(IsValidTaxIdentityNumber constraintAnnotation) {
+    public void initialize(ValidTaxIdentityNumber constraintAnnotation) {
         tinRegex = "^\\d{7}[M|G|A|P|L|H|B|Z]{1}$";
     }
 

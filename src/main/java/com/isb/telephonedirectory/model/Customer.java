@@ -1,6 +1,7 @@
 package com.isb.telephonedirectory.model;
 
-import com.isb.telephonedirectory.validator.customerid.IsValidTaxIdentityNumber;
+import com.isb.telephonedirectory.customvalidator.customerid.ValidTaxIdentityNumber;
+import com.isb.telephonedirectory.customvalidator.gender.ValidGender;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,7 @@ public class Customer {
     private String name;
 
     @NotBlank(message = "{customer.idNumber.NotBlank}")
-    @IsValidTaxIdentityNumber(message = "{customer.idNumber.IsValidTaxIdentityNumber}")
+    @ValidTaxIdentityNumber(message = "{customer.idNumber.ValidTaxIdentityNumber}")
     @Field(type = FieldType.Text)
     private String idNumber;
 
@@ -28,5 +29,6 @@ public class Customer {
 
     @NotNull(message = "{customer.gender.NotNull}")
     @Field(type = FieldType.Text)
-    private Gender gender;
+    @ValidGender(message = "{customer.gender.ValidGender}")
+    private String gender;
 }

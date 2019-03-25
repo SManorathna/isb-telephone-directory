@@ -119,10 +119,10 @@ public class MobileDirectoryInfoUpdatingServiceImpl implements MobileDirectoryIn
     }
 
     private ServiceType getChangedServiceType(final String serviceType) {
-        if(ServiceType.POST_PAID.toString().equals(serviceType)) {
-            return ServiceType.PRE_PAID;
+        if(ServiceType.MOBILE_POSTPAID.toString().equals(serviceType)) {
+            return ServiceType.MOBILE_PREPAID;
         }
 
-        return ServiceType.POST_PAID;
+        return ServiceType.MOBILE_POSTPAID;
     }
 }
