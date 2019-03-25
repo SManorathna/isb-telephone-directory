@@ -32,8 +32,13 @@ public class MobileDirectoryInfoUpdatingServiceImpl implements MobileDirectoryIn
     }
 
     @Override
-    public String switchMobileSubscriberPlan(String mobileNumber) throws InterruptedException, ExecutionException, IOException {
+    public UpdateResponse switchMobileSubscriberPlan(String mobileNumber) throws InterruptedException, ExecutionException, IOException {
         final SearchHit searchHit = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber);
+
+        if(searchHit == null) {
+            return null;
+        }
+
         final Map<String, Object> map = searchHit.getSourceAsMap();
         final String id = searchHit.getId();
 
@@ -45,13 +50,57 @@ public class MobileDirectoryInfoUpdatingServiceImpl implements MobileDirectoryIn
                         .startObject()
                         .field(ModelStructureConstants.MOB_SUB_SERVICE_TYPE, getChangedServiceType((String)map.get(ModelStructureConstants.MOB_SUB_SERVICE_TYPE)))
                         .endObject());
-        UpdateResponse updateResponse = client.update(updateRequest).get();
-        return updateResponse.status().toString();
+        return client.update(updateRequest).get();
     }
 
     @Override
-    public String updateMobileSubscribeOwner(String mobileNumber, Customer owner) throws InterruptedException, ExecutionException, IOException {
-        final String id = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber).getId();
+    public UpdateResponse updateMobileSubscribeOwner(String mobileNumber, Customer owner) throws InterruptedException, ExecutionException, IOException {
+        final SearchHit searchHit = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber);
+
+        if(searchHit == null) {
+            return null;
+        }
+
+        return updateCustomer(searchHit.getId(), ModelStructureConstants.OWNER_OBJECT, owner);
+    }
+
+    @Override
+    public UpdateResponse updateMobileSubscribeUser(String mobileNumber, Customer user) throws InterruptedException, ExecutionException, IOException {
+        final SearchHit searchHit = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber);
+
+        if(searchHit == null) {
+            return null;
+        }
+
+        return updateCustomer(searchHit.getId(), ModelStructureConstants.USER_OBJECT, user);
+    }
+
+    private UpdateResponse updateCustomer(final String id, final String objectIdentifier, final Customer customer) throws InterruptedException, ExecutionException, IOException{
+        UpdateRequest updateRequest = new UpdateRequest();
+        updateRequest.index(ModelStructureConstants.INDEX_NAME)
+                .type(ModelStructureConstants.TYPE)
+                .id(id)
+                .doc(jsonBuilder()
+                        .startObject()
+                        .startObject(objectIdentifier)
+                        .field(ModelStructureConstants.CUST_NAME, customer.getName())
+                        .field(ModelStructureConstants.CUST_ID_NUMBER, customer.getIdNumber())
+                        .field(ModelStructureConstants.CUST_OWNER_ADDRESS, customer.getAddress())
+                        .field(ModelStructureConstants.CUST_OWNER_GENDER, customer.getGender())
+                        .endObject()
+                        .endObject());
+        return client.update(updateRequest).get();
+    }
+
+    @Override
+    public UpdateResponse updateMobileSubscribeOwnerAndUser(String mobileNumber, Customer owner, Customer user) throws InterruptedException, ExecutionException, IOException {
+        final SearchHit searchHit = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber);
+
+        if(searchHit == null) {
+            return null;
+        }
+
+        final String id = searchHit.getId();
 
         UpdateRequest updateRequest = new UpdateRequest();
         updateRequest.index(ModelStructureConstants.INDEX_NAME)
@@ -65,21 +114,6 @@ public class MobileDirectoryInfoUpdatingServiceImpl implements MobileDirectoryIn
                         .field(ModelStructureConstants.CUST_OWNER_ADDRESS, owner.getAddress())
                         .field(ModelStructureConstants.CUST_OWNER_GENDER, owner.getGender())
                         .endObject()
-                        .endObject());
-        UpdateResponse updateResponse = client.update(updateRequest).get();
-        return updateResponse.status().toString();
-    }
-
-    @Override
-    public String updateMobileSubscribeUser(String mobileNumber, Customer user) throws InterruptedException, ExecutionException, IOException {
-        final String id = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber).getId();
-
-        UpdateRequest updateRequest = new UpdateRequest();
-        updateRequest.index(ModelStructureConstants.INDEX_NAME)
-                .type(ModelStructureConstants.TYPE)
-                .id(id)
-                .doc(jsonBuilder()
-                        .startObject()
                         .startObject(ModelStructureConstants.USER_OBJECT)
                         .field(ModelStructureConstants.CUST_NAME, user.getName())
                         .field(ModelStructureConstants.CUST_ID_NUMBER, user.getIdNumber())
@@ -87,35 +121,7 @@ public class MobileDirectoryInfoUpdatingServiceImpl implements MobileDirectoryIn
                         .field(ModelStructureConstants.CUST_OWNER_GENDER, user.getGender())
                         .endObject()
                         .endObject());
-        UpdateResponse updateResponse = client.update(updateRequest).get();
-        return updateResponse.status().toString();
-    }
-
-    @Override
-    public String updateMobileSubscribeOwnerAndUser(String mobileNumber, Customer owner, Customer user) throws InterruptedException, ExecutionException, IOException {
-        final String id = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber).getId();
-
-        UpdateRequest updateRequest = new UpdateRequest();
-        updateRequest.index(ModelStructureConstants.INDEX_NAME)
-                .type(ModelStructureConstants.TYPE)
-                .id(id)
-                .doc(jsonBuilder()
-                        .startObject()
-                        .startObject(ModelStructureConstants.OWNER_OBJECT)
-                        .field(ModelStructureConstants.CUST_NAME, owner.getName())
-                        .field(ModelStructureConstants.CUST_ID_NUMBER, owner.getIdNumber())
-                        .field(ModelStructureConstants.CUST_OWNER_ADDRESS, owner.getAddress())
-                        .field(ModelStructureConstants.CUST_OWNER_GENDER, owner.getGender())
-                        .endObject()
-                        .startObject(ModelStructureConstants.USER_OBJECT)
-                        .field(ModelStructureConstants.CUST_NAME, user.getName())
-                        .field(ModelStructureConstants.CUST_ID_NUMBER, user.getIdNumber())
-                        .field(ModelStructureConstants.CUST_OWNER_ADDRESS, user.getAddress())
-                        .field(ModelStructureConstants.CUST_OWNER_GENDER, user.getGender())
-                        .endObject()
-                        .endObject());
-        UpdateResponse updateResponse = client.update(updateRequest).get();
-        return updateResponse.status().toString();
+        return client.update(updateRequest).get();
     }
 
     private ServiceType getChangedServiceType(final String serviceType) {

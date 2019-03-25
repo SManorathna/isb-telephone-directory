@@ -38,11 +38,11 @@ public class MobileDirectoryInfoRetrievingServiceImpl implements MobileDirectory
     @Override
     public Map<String, Object> getMobileSubscriberByMobileNumber(String mobileNumber) {
         SearchHit searchHit = getSearchHitByMobileNumber(mobileNumber);
-        return searchHit.getSourceAsMap();
+        return searchHit != null ? searchHit.getSourceAsMap() : null;
     }
 
     @Override
-    public List<Map<String, Object>> getMobileSubscriberByCriteriaText(final Map<String, List<String>> queryParams) throws NumberFormatException {
+    public List<Map<String, Object>> getMobileSubscriberByCriteriaText(final Map<String, List<String>> queryParams) {
         final SearchCriteriaObject searchCriteriaObject = inputParamFormatterService.getFormattedSearchCriteriaInput(queryParams);
         final BoolQueryBuilder queryBuilder = queryBuilderService.getQueryBuilder(searchCriteriaObject.getSearchParamMap());
 
@@ -93,6 +93,6 @@ public class MobileDirectoryInfoRetrievingServiceImpl implements MobileDirectory
                         .setSearchType(SearchType.QUERY_THEN_FETCH)
                         .setQuery(QueryBuilders.matchQuery(ModelStructureConstants.MOB_SUB_MOBILE_NUMBER, mobileNumber)).get();
 
-        return Arrays.asList(response.getHits().getHits()).get(0);
+        return response.getHits().getHits().length > 0 ? Arrays.asList(response.getHits().getHits()).get(0) : null;
     }
 }

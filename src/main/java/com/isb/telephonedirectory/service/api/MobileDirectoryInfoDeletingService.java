@@ -1,7 +1,9 @@
 package com.isb.telephonedirectory.service.api;
 
+import org.elasticsearch.action.delete.DeleteResponse;
+
 public interface MobileDirectoryInfoDeletingService {
-    String deleteMobileSubscriber(String mobileNumber);
+    DeleteResponse deleteMobileSubscriber(String mobileNumber);
 
     void deleteAll();
 }

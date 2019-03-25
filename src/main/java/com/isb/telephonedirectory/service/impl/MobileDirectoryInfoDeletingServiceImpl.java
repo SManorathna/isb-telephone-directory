@@ -6,6 +6,7 @@ import com.isb.telephonedirectory.service.api.MobileDirectoryInfoRetrievingServi
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.search.SearchHit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +24,18 @@ public class MobileDirectoryInfoDeletingServiceImpl implements MobileDirectoryIn
     }
 
     @Override
-    public String deleteMobileSubscriber(String mobileNumber) {
-        DeleteResponse deleteResponse =
-                client.prepareDelete(ModelStructureConstants.INDEX_NAME,
-                ModelStructureConstants.TYPE,
-                infoRetrievingService.getSearchHitByMobileNumber(mobileNumber).getId())
-                .get();
+    public DeleteResponse deleteMobileSubscriber(String mobileNumber) {
+        final SearchHit searchHit = infoRetrievingService.getSearchHitByMobileNumber(mobileNumber);
 
-        return deleteResponse.getResult().toString();
+        if(searchHit == null) {
+            return null;
+        }
+
+        DeleteResponse deleteResponse = client.prepareDelete(ModelStructureConstants.INDEX_NAME,
+                ModelStructureConstants.TYPE,
+                searchHit.getId()).get();
+
+        return deleteResponse;
     }
 
     @Override
