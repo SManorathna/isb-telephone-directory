@@ -57,7 +57,7 @@ public class MobileDirectoryController {
 
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity<String> createMobileSubscriber(@Valid @RequestBody final MobileSubscriber mobileSubscriber,
-                                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) throws IOException {
+                                                         @RequestHeader(name = "Accept-Language", required = false) final Locale locale) throws IOException {
         IndexResponse response = infoPersistingService.createMobileSubscriber(mobileSubscriber);
 
         if(response == null || response.status() != RestStatus.CREATED) {
@@ -69,7 +69,7 @@ public class MobileDirectoryController {
 
     @RequestMapping(value = "/switch-plan/{mobileNumber}", method = RequestMethod.PUT)
     public ResponseEntity<String> switchMobileSubscriberPlan(@PathVariable final String mobileNumber,
-                                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+                                                             @RequestHeader(name = "Accept-Language", required = false) final Locale locale)
             throws InterruptedException, ExecutionException, IOException {
         final UpdateResponse response = infoUpdatingService.switchMobileSubscriberPlan(mobileNumber);
 
@@ -83,7 +83,7 @@ public class MobileDirectoryController {
     @RequestMapping(value = "/owners/{mobileNumber}", method = RequestMethod.PUT)
     public ResponseEntity<String> updateMobileSubscribeOwner(@PathVariable final String mobileNumber,
                                                              @Valid @RequestBody final Customer owner,
-                                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+                                                             @RequestHeader(name = "Accept-Language", required = false) final Locale locale)
             throws InterruptedException, ExecutionException, IOException {
         final UpdateResponse response = infoUpdatingService.updateMobileSubscribeOwner(mobileNumber, owner);
 
@@ -97,7 +97,7 @@ public class MobileDirectoryController {
     @RequestMapping(value = "/users/{mobileNumber}", method = RequestMethod.PUT)
     public ResponseEntity<String> updateMobileSubscribeUser(@PathVariable final String mobileNumber,
                                                             @Valid @RequestBody final Customer user,
-                                                            @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+                                                            @RequestHeader(name = "Accept-Language", required = false) final Locale locale)
             throws InterruptedException, ExecutionException, IOException {
         final UpdateResponse response = infoUpdatingService.updateMobileSubscribeUser(mobileNumber, user);
 
@@ -111,7 +111,7 @@ public class MobileDirectoryController {
     @RequestMapping(value = "/owners-users/{mobileNumber}", method = RequestMethod.PUT)
     public ResponseEntity<String> updateMobileSubscribeOwnerAndUser(@PathVariable final String mobileNumber,
                                                                     @Valid @RequestBody final Map<String, Customer> customerMap,
-                                                                    @RequestHeader(name = "Accept-Language", required = false) Locale locale)
+                                                                    @RequestHeader(name = "Accept-Language", required = false) final Locale locale)
             throws InterruptedException, ExecutionException, IOException {
         final Customer owner = customerMap.get(ModelStructureConstants.OWNER_OBJECT);
         final Customer user = customerMap.get(ModelStructureConstants.USER_OBJECT);
@@ -127,7 +127,7 @@ public class MobileDirectoryController {
 
     @RequestMapping(value = "/{mobileNumber}", method = RequestMethod.DELETE)
     public ResponseEntity<String> deleteMobileSubscriber(@PathVariable final String mobileNumber,
-                                                         @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+                                                         @RequestHeader(name = "Accept-Language", required = false) final Locale locale) {
         DeleteResponse response = infoDeletingService.deleteMobileSubscriber(mobileNumber);
 
         if(response == null) {
@@ -144,30 +144,23 @@ public class MobileDirectoryController {
 
     @RequestMapping(value = "/all", method = RequestMethod.GET)
     public ResponseEntity<List<Map<String, Object>>> getAllMobileSubscribers(@RequestParam final MultiValueMap<String, String> queryParams,
-                                                                             @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+                                                                             @RequestHeader(name = "Accept-Language", required = false) final Locale locale) {
         final List<Map<String, Object>> result = infoRetrievingService.getAllMobileSubscribers(queryParams);
 
         if(result == null || result.isEmpty()) {
-            throw new ResultNotFoundException(messageSource.getMessage("reading.failed", null, locale));
+            handleResultNotFoundException(locale);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
-        /*Resource<List<Map<String, Object>>> resource = new Resource<>(result);
-        final ControllerLinkBuilder link = ControllerLinkBuilder.linkTo(ControllerLinkBuilder.methodOn(this.getClass()).getMobileSubscriberByCriteriaText("mobileNumber"));
-        resource.add(link.withRel("subscriber by mobile number"));
-
-
-
-        return resource;*/
     }
 
     @RequestMapping(value = "/{mobileNumber}", method = RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> getMobileSubscriberByCriteriaText(@PathVariable final String mobileNumber,
-                                                                                 @RequestHeader(name = "Accept-Language", required = false) Locale locale) {
+                                                                                 @RequestHeader(name = "Accept-Language", required = false) final Locale locale) {
         final Map<String, Object> result = infoRetrievingService.getMobileSubscriberByMobileNumber(mobileNumber);
 
         if(result == null || result.isEmpty()) {
-            throw new ResultNotFoundException(messageSource.getMessage("reading.failed", null, locale));
+            handleResultNotFoundException(locale);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -175,13 +168,17 @@ public class MobileDirectoryController {
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public ResponseEntity<List<Map<String, Object>>> getMobileSubscriberByCriteriaText(@RequestParam final MultiValueMap<String, String> queryParams,
-                                                                                       @RequestHeader(name = "Accept-Language", required = false) Locale locale) throws RuntimeException {
+                                                                                       @RequestHeader(name = "Accept-Language", required = false) final Locale locale) throws RuntimeException {
         final List<Map<String, Object>> result = infoRetrievingService.getMobileSubscriberByCriteriaText(queryParams);
 
         if(result == null || result.isEmpty()) {
-            throw new ResultNotFoundException(messageSource.getMessage("reading.failed", null, locale));
+            handleResultNotFoundException(locale);
         }
 
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    private void handleResultNotFoundException(final Locale locale) {
+        throw new ResultNotFoundException(messageSource.getMessage("reading.failed", null, locale));
     }
 }
