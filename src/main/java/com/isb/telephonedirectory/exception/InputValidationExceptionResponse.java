@@ -1,8 +1,11 @@
 package com.isb.telephonedirectory.exception;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.Set;
 
+@Getter
 public class InputValidationExceptionResponse extends ExceptionResponse {
 
     private final Map<String, Set<String>> errors;
@@ -14,9 +17,4 @@ public class InputValidationExceptionResponse extends ExceptionResponse {
         super(timestamp, errorCode, errorMessage);
         this.errors = errors;
     }
-
-    public Map<String, Set<String>> getErrors() {
-        return errors;
-    }
-
 }

@@ -1,11 +1,13 @@
 package com.isb.telephonedirectory.model.internal;
 
 import com.isb.telephonedirectory.constants.Constants;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class SearchCriteriaObject {
     private Map<String, List<String>> searchParamMap;
     private String[] requiredFields;
@@ -24,21 +26,5 @@ public class SearchCriteriaObject {
         this.requiredFields = requiredFields;
         this.limit = limit;
         this.offset = offset - 1;
-    }
-
-    public Map<String, List<String>> getSearchParamMap() {
-        return searchParamMap;
-    }
-
-    public String[] getRequiredFields() {
-        return requiredFields;
-    }
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public int getOffset() {
-        return offset;
     }
 }
